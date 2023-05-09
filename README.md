@@ -15,7 +15,7 @@ go get github.com/tealeg/xlsx
 
 ```
 
-Save the program: Save the program code to a file named main.go.
+Save the program: Save the program code to a file named c2point.go.
 
 Configure authentication: Replace the placeholder values in the authCnfg struct with your SharePoint site URL, username, and password.
 
