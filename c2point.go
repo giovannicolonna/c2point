@@ -28,8 +28,8 @@ func main() {
 	fmt.Printf("Site title: %s\n", res.Data().Title)	
 	
 	// +++++ SET HERE YOUR FILENAME
-	fileName := "gctesting.xlsx"
-	fileRelativeURL := "/sites/gctesting/Shared Documents/" + fileName
+	fileName := "yourfile.xlsx"
+	fileRelativeURL := "/sites/yoursite/Shared Documents/" + fileName
 	
 	file, err := sp.Web().GetFile(fileRelativeURL).Download()
 	if err != nil {
