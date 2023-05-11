@@ -29,7 +29,7 @@ https://learn.microsoft.com/en-us/sharepoint/dev/solution-guidance/security-appo
 
 Replace the placeholder values in the /config/private.json files
 
-## Note that Cert Auth is the only Auth actually working with SharePoint online
+****Note that Cert Auth is the only Auth actually working with SharePoint online
 
 Here is an example of how to initialize private.json with the necessary fields for SharePoint Online authentication using Cert Auth as specified in GoSip Documentation (in this link you'll find script to generate self-signed cert): https://go.spflow.com/auth/strategies/azure-certificate-auth
 
@@ -45,7 +45,7 @@ Here is an example of how to initialize private.json with the necessary fields f
 
 ```
 Make sure to replace the placeholders (tenant-id, clientId, certPath and certPass) with the actual values for your SharePoint environment.
-
+**Create a 'config' folder in same directory of your .go file and put inside it the private.json and the .pfx cert file**
 
 
 # Update file path
