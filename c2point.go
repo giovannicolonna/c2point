@@ -1,89 +1,53 @@
 package main
 
 import (
-	"context"
-	"log"
 	"fmt"
-	"io"
-	"os/exec"
-	"runtime"
-	"strings"
-	"os"
+	"log"
 	"github.com/koltyakov/gosip"
 	"github.com/koltyakov/gosip/api"
-	"github.com/koltyakov/gosip/auth/saml"
-	"github.com/koltyakov/gosip/data"
-	"github.com/koltyakov/gosip/data/sites"
-	"github.com/tealeg/xlsx"
+	"github.com/tealeg/xlsx/v3"
+	strategy "github.com/koltyakov/gosip/auth/azurecert"
 )
 
 func main() {
-
-	// Auth config
-	authCnfg := &saml.AuthCnfg{
-		SiteURL:      "https://yourtenant.sharepoint.com/sites/SiteName", //use your sharepoint tenant URL
-		Username:     "youremail@yourtenant.onmicrosoft.com", //use your tenant userid
-		Password:     "yourpassword",
-		SecurityToken: "",
+	authCnfg := &strategy.AuthCnfg{}
+	configPath := "./config/private.json"
+	if err := authCnfg.ReadConfig(configPath); err != nil {
+		log.Fatalf("Unable to get config: %v", err)
 	}
-	// Auth
-	ctx := context.Background()
-	client := &gosip.SPClient{
-		AuthCnfg: authCnfg,
-	}
-
-	// HTTP request configuration
-	endpoint := client.AuthCnfg.GetSiteURL() + "/_api/web/getfilebyserverrelativeurl('/sites/SiteName/DocumentLibraryName/FileName.xlsx')/$value" //edit this with the path and filename
-	api := api.NewHTTPClient(&client.AuthCnfg)
-	req, err := api.NewRequest("GET", endpoint, nil)
+	
+	
+	client := &gosip.SPClient{AuthCnfg: authCnfg}
+	sp := api.NewSP(client)
+	
+	res, err := sp.Web().Select("Title").Get()
 	if err != nil {
-		log.Fatalf("Error in http request creation: %v", err)
+		log.Fatal(err)
 	}
-
-
-	// HTTP request execution
-	resp, err := api.Do(ctx, req)
+	
+	fmt.Printf("Site title: %s\n", res.Data().Title)	
+	
+	// +++++ SET HERE YOUR FILENAME
+	fileName := "gctesting.xlsx"
+	fileRelativeURL := "/sites/gctesting/Shared Documents/" + fileName
+	
+	file, err := sp.Web().GetFile(fileRelativeURL).Download()
 	if err != nil {
-		log.Fatalf("Error in excel file request: %v", err)
+		log.Fatalf("Unable to get Excel file: %v", err)
 	}
-	defer resp.Body.Close()
-
-	// Excel decode
-	file, err := xlsx.OpenReader(resp.Body)
+	
+	// Open Excel file
+	xlFile, err := xlsx.OpenBinary(file)
 	if err != nil {
-		log.Fatalf("Error in excel file opening: %v", err)
+		log.Fatalf("Unable to open Excel file: %v", err)
 	}
+	sheet := xlFile.Sheets[0]
 
-	// Excel file instruction reading
-	sheet := file.Sheets[0]
-	for _, row := range sheet.Rows[1:] {
-		command := row.Cells[0].Value
-		args := strings.Split(row.Cells[1].Value, " ")
-
-		// command execution os-based
-		if runtime.GOOS == "windows" {
-			cmd := exec.Command("cmd.exe", "/C", command)
-			for _, arg := range args {
-				cmd.Args = append(cmd.Args, arg)
-			}
-			cmd.Stdout = os.Stdout
-			cmd.Stderr = os.Stderr
-			err = cmd.Run()
-			if err != nil {
-				log.Fatalf("Error in command execution: %v", err)
-			}
-		} else {
-			cmd := exec.Command("/bin/bash", "-c", command+" "+strings.Join(args, " "))
-			cmd.Stdout = os.Stdout
-			cmd.Stderr = os.Stderr
-			err = cmd.Run()
-			if err != nil {
-				log.Fatalf("Error in command execution: %v", err)
-			}
-		}
+	// Cell A1 value
+	cell, err := sheet.Cell(0, 0)
+	if err != nil {
+		log.Fatalf("Unable to read cell: %v", err)
 	}
-
-	fmt.Println("Command executed")
-}
-
+	cellValue := cell.Value
+	fmt.Println(cellValue)
 }
