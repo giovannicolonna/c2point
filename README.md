@@ -12,70 +12,39 @@ The program depends on several third-party packages, which can be installed usin
 
 go get github.com/koltyakov/gosip
 go get github.com/koltyakov/gosip/api
-go get github.com/koltyakov/gosip/auth/saml
-go get github.com/tealeg/xlsx
+go get github.com/koltyakov/gosip/auth/azurecert
+go get github.com/tealeg/xlsx/v3
 
 ```
 
-Save the program: Save the program code to a file named c2point.go.
+
 
 # Configure authentication: 
-Replace the placeholder values in the authCnfg struct with your SharePoint auth info:
 
-Here is an example of how to initialize AuthCnfg with the necessary fields for SharePoint Online authentication using OAuth2:
+The program works with the support of a valid Azure Tenant with Sharepoint Online (Business subscription). According to Microsoft Documentation, set up your Azure environment to accept App-only access to an Azure app. You will need to register a new AAD Application and grant it to access SharePoint Online. 
+
+Create a new Azure app and set up grants and certificate access as follows:
+
+https://learn.microsoft.com/en-us/sharepoint/dev/solution-guidance/security-apponly-azuread
+
+Replace the placeholder values in the /config/private.json files
+
+## Note that Cert Auth is the only Auth actually working with SharePoint online
+
+Here is an example of how to initialize private.json with the necessary fields for SharePoint Online authentication using Cert Auth as specified in GoSip Documentation (in this link you'll find script to generate self-signed cert): https://go.spflow.com/auth/strategies/azure-certificate-auth
 
 ```
-auth := &gosip.AuthCnfg{
-    Strategy:    "saml",
-    LoginURL:    "https://login.microsoftonline.com/<tenant-id>/saml2",
-    LogoutURL:   "https://<tenant-name>.sharepoint.com/_layouts/15/SignOut.aspx",
-    RelyingParty: "<relying-party>",
-    Username:    "<username>",
-    Password:    "<password>",
-    ClientID:    "<client-id>",
-    ClientSecret: "<client-secret>",
-    Realm:       "<realm>",
-    SiteURL:     "<site-url>",
+
+{
+	"siteUrl": "https://your-site.sharepoint.com/sites/your-site-name",
+	"tenantId": "your-tenantid",
+	"clientId": "your-clientid",
+	"certPath": "cert.pfx",
+	"certPass": "password"
 }
+
 ```
-Make sure to replace the placeholders (tenant-id, tenant-name, relying-party, username, password, client-id, client-secret, realm, and site-url) with the actual values for your SharePoint environment.
-
-To retrieve the values for RelyingParty, ClientID, ClientSecret, and Realm, you will need to register an application in Azure Active Directory (AD) and grant it permissions to access SharePoint Online resources.
-
-Here are the steps to retrieve these values:
-
-1)    Go to the Azure portal (https://portal.azure.com/) and sign in with your Microsoft account.
-
-2)    Click on the "Azure Active Directory" service and select the "App registrations" option.
-
-3)    Click on the "New registration" button to create a new application.
-
-4)    Provide a name for the application and select "Accounts in this organizational directory only" as the supported account type.
-
-5)    For the "Redirect URI" field, enter a placeholder URL such as "https://localhost".
-
-6)   After creating the application, you will see its "Application (client) ID" on the Overview page. This is the value you will use for ClientID.
-
-7)    Under the "Certificates & secrets" tab, click on the "New client secret" button to generate a new secret. This will display the secret value which you will use for ClientSecret.
-
-8)    Under the "API permissions" tab, click on the "Add a permission" button and select "Microsoft Graph" as the API.
-
-9)    Select the "Application permissions" option and search for the "Sites.FullControl.All" permission.
-
-10)    Click on the "Add permission" button to grant the permission to the application.
-
-11)    Finally, under the "Endpoints" tab, you will find the values for RelyingParty and Realm.
-
-Note that the value for RelyingParty is the URL that is displayed under the "Federation Metadata Document" endpoint.
-
-The value for Realm is the value that appears after https://sts.windows.net/ in the "Issuer URL" endpoint.
-
-Make sure to copy these values exactly as they appear, including any special characters such as forward slashes or colons.
-
-Once you have retrieved these values, you can use them to initialize the AuthCnfg struct for SharePoint Online authentication in your Go program.
-
-
-
+Make sure to replace the placeholders (tenant-id, clientId, certPath and certPass) with the actual values for your SharePoint environment.
 
 
 
@@ -87,7 +56,7 @@ Once you have retrieved these values, you can use them to initialize the AuthCnf
 
 ```
 
-go build
+go build c2point.go
 ./c2point
 
 ```
