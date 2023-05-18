@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os/exec"
 	"os"
+	"runtime"
 	"github.com/koltyakov/gosip"
 	"github.com/koltyakov/gosip/api"
 	"github.com/tealeg/xlsx/v3"
@@ -13,31 +14,44 @@ import (
 )
 
 func main() {
+
+
+	// ++++++ Auth on Azure
+	//
+	// The only Auth supported for accessing SPOL is through certificate
+	// 
+	// Create a self-signed cert, upload .cer on Azure Auth of your apps like explained in READMEmd
+	// Use cert .pfx file and private.json in same folder of executable, after compiling
+	//
+	
+	
+	
+	
 	authCnfg := &strategy.AuthCnfg{}
-	configPath := "./config/private.json"
+	configPath := "private.json"
 	if err := authCnfg.ReadConfig(configPath); err != nil {
 		log.Fatalf("Unable to get config: %v", err)
 	}
-	
-	
 	client := &gosip.SPClient{AuthCnfg: authCnfg}
-	sp := api.NewSP(client)
-	
+	sp := api.NewSP(client)	
 	res, err := sp.Web().Select("Title").Get()
 	if err != nil {
 		log.Fatal(err)
 	}
-	
 	fmt.Printf("Site title: %s\n", res.Data().Title)	
 	
-	// +++++ SET HERE YOUR FILENAME
-	fileName := "yourfile.xlsx"
+	// +++++ SET HERE YOUR FILENAME ON SHAREPOINT THAT CONTAINS THE COMMAND
+	fileName := "yourcommand.xlsx" 
+	
+	// +++++ SET HERE YOUR SHAREPOINT PATH 
 	fileRelativeURL := "/sites/yoursite/Shared Documents/" + fileName
 	
 	file, err := sp.Web().GetFile(fileRelativeURL).Download()
 	if err != nil {
 		log.Fatalf("Unable to get Excel file: %v", err)
 	}
+	folder := sp.Web().GetFolder("Shared Documents")
+	
 	
 	// Open Excel file
 	xlFile, err := xlsx.OpenBinary(file)
@@ -45,6 +59,7 @@ func main() {
 		log.Fatalf("Unable to open Excel file: %v", err)
 	}
 	sheet := xlFile.Sheets[0]
+
 
 	// Cell A1 value
 	cell, err := sheet.Cell(0, 0)
@@ -54,14 +69,19 @@ func main() {
 	cellValue := cell.Value
 	fmt.Println(cellValue)
 	
-	// exec system command (unix for now)
-	cmd := exec.Command("/bin/sh", "-c", cellValue)
+	// exec command - platform aware
+	var cmd *exec.Cmd
+	if runtime.GOOS == "windows" {
+	    cmd = exec.Command("cmd.exe", "/c", cellValue)
+	} else {
+	    cmd = exec.Command("/bin/sh", "-c", cellValue)
+	}
 	output, err := cmd.Output()
 	if err != nil {
 		log.Fatalf("Error in command execution: %v", err)
 	}
 
-	// output write in excel cell
+	// output print into temp excel file
 	newCell, err := sheet.Cell(0, 1)
 	if err != nil {
 		log.Fatalf("Unable to access cell: %v",err)
@@ -69,7 +89,7 @@ func main() {
 	newCell.SetValue(string(output))
 
 	
-	// temporary local save and upload output.xlsx in sharepoint
+	// temporary local save and upload on Sharepoint the output of the command
 	if err := xlFile.Save("temp.xlsx"); err != nil {
 		log.Fatalf("Error in excel save: %v", err)
 	}
@@ -88,5 +108,4 @@ func main() {
 	
 	
 	fmt.Printf("New file URL: %s\n", fileAddResp.Data().ServerRelativeURL)
-	
 }
