@@ -1,5 +1,10 @@
 # c2point
-c2point
+c2point - experimental and basic c2 structure in Go that uses Attacker-owned Azure Tenant (Sharepoint) as Command and Control.
+This is a very simple project that aims to make the "agent" execute a (one for now :) ) command on target server from instructions written into an Online Excel file.
+
+# Prerequisites
+Global Admin on an Azure Tenant (if you have a lab, give it a try, set up your Developer Account in Microsoft to try O365 for free)
+
 
 # Install Go: 
 If you haven't already, download and install Go from the official website: https://golang.org/dl/. Follow the installation instructions for your operating system.
@@ -27,7 +32,7 @@ Create a new Azure app and set up grants and certificate access as follows:
 
 https://learn.microsoft.com/en-us/sharepoint/dev/solution-guidance/security-apponly-azuread
 
-Replace the placeholder values in the /config/private.json files
+Replace the placeholder values in the private.json files
 
 ****Note that Cert Auth is the only Auth actually working with SharePoint online
 
@@ -64,7 +69,19 @@ go build c2point.go
 If you're on Windows, the compiled executable will be named c2point.exe. In that case, run the following command instead:
 
 ```
+GOOS=windows GOARCH=amd64 go build -o ./bin/c2point.exe c2point.go 
+
 c2point.exe
 ```
 
 The program will read the instructions from the Excel file and execute them as command-line commands on your machine. On Windows, the commands will be executed using the cmd.exe shell, while on Unix-based systems they will be executed using the /bin/bash shell.
+
+Note that - for now - cert.pfx file and private.json must be in same folder.
+
+# Further improvements
+Many, this is a sort of experiment:
+1 - introduce infinite loop for keeping the program listening for update commands in excel file
+2 - modify code in order to not have .pfx and .json in same folder of executable (embedded Auth in GOSip throws errors)
+3 - Usage of Graph API (Go support is still too much in early stage as per May 2023)
+
+
