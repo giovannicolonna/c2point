@@ -1,6 +1,12 @@
 # c2point
-c2point - experimental and basic c2 structure in Go that uses Attacker-owned Azure Tenant (Sharepoint) as Command and Control.
-This is a very simple project that aims to make the "agent" execute a (one for now :) ) command on target server from instructions written into an Online Excel file.
+c2point - Proof of Concept of a c2 structure in Go that uses Attacker-owned Azure Tenant (Sharepoint) as Command and Control.
+This is a very simple project that aims to make the "agent" execute commands on target server from instructions written into an Online Excel file.
+
+The agent will poll the attacker-owned SharePoint site, to retrieve the command into an Excel file and execute it.
+
+Command result will be communicated to SharePoint via another excel file (Result)
+
+
 
 # Prerequisites
 Global Admin on an Azure Tenant (if you have a lab, give it a try, set up your Developer Account in Microsoft to try O365 for free)
@@ -54,7 +60,12 @@ Make sure to replace the placeholders (tenant-id, clientId, certPath and certPas
 
 
 # Update file path
-  Update the file path in the endpoint variable to point to your SharePoint file.
+  Update the file paths into the source code (see commented lines)
+  
+# Create your c2 file
+  Create a new excel file on your sharepoint site that will act as c2 panel, update accordingly the variables in the code by pointing to right excel file (default name is yourcommand.xlsx)
+  
+  **Commands must be inserted in the very first cell 0,0
 
 # Compile and run the program:
   Open a terminal or command prompt and navigate to the directory containing the c2point.go file. Run the following commands to compile and execute the program:
@@ -73,14 +84,21 @@ GOOS=windows GOARCH=amd64 go build -o ./bin/c2point.exe c2point.go
 
 c2point.exe
 ```
+# Usage
 
-The program will read the instructions from the Excel file and execute them as command-line commands on your machine. On Windows, the commands will be executed using the cmd.exe shell, while on Unix-based systems they will be executed using the /bin/bash shell.
+The program will read the instructions from the 0,0 Cell in Excel file and execute them as command-line commands on your machine. On Windows, the commands will be executed using the cmd.exe shell, while on Unix-based systems they will be executed using the /bin/bash shell.
 
-Note that - for now - cert.pfx file and private.json must be in same folder.
+**Only the first cell must be filled with the command at this time (further improvements will be possible :) )
+
+Note that - for now - cert.pfx file and private.json must be in same folder of the executable.
+
+# Output
+Check your Sharepoint site. A file (default: output.xlsx) will contain the output of your command.
+**Note that a 15 seconds delay has been hardcoded in order to let the online docs be aligned 
 
 # Further improvements
-Many, this is a sort of experiment:
-1 - introduce infinite loop for keeping the program listening for update commands in excel file
+Many, this is a sort of experiment, nothing more than a PoC:
+1 - Avoid double excel and try to have all the commands history in one file
 2 - modify code in order to not have .pfx and .json in same folder of executable (embedded Auth in GOSip throws errors)
 3 - Usage of Graph API (Go support is still too much in early stage as per May 2023)
 
