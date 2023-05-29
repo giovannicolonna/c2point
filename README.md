@@ -6,16 +6,19 @@ The agent will poll the attacker-owned SharePoint site, to retrieve the command 
 
 Command result will be communicated to SharePoint via another excel file (Result)
 
+## Workflow
+
+![image](https://github.com/giovannicolonna/c2point/assets/10105061/f0f2fbac-4fe9-45fa-bccc-d02c33d9712d)
 
 
-# Prerequisites
+## Prerequisites
 Global Admin on an Azure Tenant (if you have a lab, give it a try, set up your Developer Account in Microsoft to try O365 for free)
 
 
-# Install Go: 
+## Install Go: 
 If you haven't already, download and install Go from the official website: https://golang.org/dl/. Follow the installation instructions for your operating system.
 
-# Install dependencies: 
+## Install dependencies: 
 The program depends on several third-party packages, which can be installed using the following command:
 
 
@@ -30,7 +33,7 @@ go get github.com/tealeg/xlsx/v3
 
 
 
-# Configure authentication: 
+## Configure authentication: 
 
 The program works with the support of a valid Azure Tenant with Sharepoint Online (Business subscription). According to Microsoft Documentation, set up your Azure environment to accept App-only access to an Azure app. You will need to register a new AAD Application and grant it to access SharePoint Online. 
 
@@ -40,7 +43,7 @@ https://learn.microsoft.com/en-us/sharepoint/dev/solution-guidance/security-appo
 
 Replace the placeholder values in the private.json files
 
-****Note that Cert Auth is the only Auth actually working with SharePoint online
+### Note that Cert Auth is the only Auth actually working with SharePoint online
 
 Here is an example of how to initialize private.json with the necessary fields for SharePoint Online authentication using Cert Auth as specified in GoSip Documentation (in this link you'll find script to generate self-signed cert): https://go.spflow.com/auth/strategies/azure-certificate-auth
 
@@ -56,18 +59,18 @@ Here is an example of how to initialize private.json with the necessary fields f
 
 ```
 Make sure to replace the placeholders (tenant-id, clientId, certPath and certPass) with the actual values for your SharePoint environment.
-**Create a 'config' folder in same directory of your .go file and put inside it the private.json and the .pfx cert file**
+### Create a 'config' folder in same directory of your .go file and put inside it the private.json and the .pfx cert file**
 
 
-# Update file path
+## Update file path
   Update the file paths into the source code (see commented lines)
   
-# Create your c2 file
+## Create your c2 file
   Create a new excel file on your sharepoint site that will act as c2 panel, update accordingly the variables in the code by pointing to right excel file (default name is yourcommand.xlsx)
   
-  **Commands must be inserted in the very first cell 0,0
+  ### Commands must be inserted in the very first cell 0,0
 
-# Compile and run the program:
+## Compile and run the program:
   Open a terminal or command prompt and navigate to the directory containing the c2point.go file. Run the following commands to compile and execute the program:
 
 ```
@@ -84,22 +87,23 @@ GOOS=windows GOARCH=amd64 go build -o ./bin/c2point.exe c2point.go
 
 c2point.exe
 ```
-# Usage
+## Usage
 
 The program will read the instructions from the 0,0 Cell in Excel file and execute them as command-line commands on your machine. On Windows, the commands will be executed using the cmd.exe shell, while on Unix-based systems they will be executed using the /bin/bash shell.
 
-**Only the first cell must be filled with the command at this time (further improvements will be possible :) )
+### Only the first cell must be filled with the command at this time (further improvements will be possible :) )
 
 Note that - for now - cert.pfx file and private.json must be in same folder of the executable.
 
-# Output
+## Output
 Check your Sharepoint site. A file (default: output.xlsx) will contain the output of your command.
-**Note that a 15 seconds delay has been hardcoded in order to let the online docs be aligned 
 
-# Further improvements
+### Note that a 15 seconds delay has been hardcoded in order to let the online docs be aligned 
+
+## Further improvements
 Many, this is a sort of experiment, nothing more than a PoC:
-1 - Avoid double excel and try to have all the commands history in one file
-2 - modify code in order to not have .pfx and .json in same folder of executable (embedded Auth in GOSip throws errors)
-3 - Usage of Graph API (Go support is still too much in early stage as per May 2023)
+1) Avoid double excel and try to have all the commands history in one file
+2) modify code in order to not have .pfx and .json in same folder of executable (embedded Auth in GOSip throws errors)
+3) Usage of Graph API (Go support is still too much in early stage as per May 2023)
 
 
