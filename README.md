@@ -43,7 +43,7 @@ https://learn.microsoft.com/en-us/sharepoint/dev/solution-guidance/security-appo
 
 Replace the placeholder values in the private.json files
 
-### Note that Cert Auth is the only Auth actually working with SharePoint online
+**Note that Cert Auth is the only Auth currently working with SharePoint online**
 
 Here is an example of how to initialize private.json with the necessary fields for SharePoint Online authentication using Cert Auth as specified in GoSip Documentation (in this link you'll find script to generate self-signed cert): https://go.spflow.com/auth/strategies/azure-certificate-auth
 
@@ -59,7 +59,7 @@ Here is an example of how to initialize private.json with the necessary fields f
 
 ```
 Make sure to replace the placeholders (tenant-id, clientId, certPath and certPass) with the actual values for your SharePoint environment.
-### Create a 'config' folder in same directory of your .go file and put inside it the private.json and the .pfx cert file**
+**Create a 'config' folder in same directory of your .go file and put inside it the private.json and the .pfx cert file**
 
 
 ## Update file path
@@ -68,7 +68,7 @@ Make sure to replace the placeholders (tenant-id, clientId, certPath and certPas
 ## Create your c2 file
   Create a new excel file on your sharepoint site that will act as c2 panel, update accordingly the variables in the code by pointing to right excel file (default name is yourcommand.xlsx)
   
-  ### Commands must be inserted in the very first cell 0,0
+**Commands must be inserted in the very first cell 0,0**
 
 ## Compile and run the program:
   Open a terminal or command prompt and navigate to the directory containing the c2point.go file. Run the following commands to compile and execute the program:
@@ -91,19 +91,23 @@ c2point.exe
 
 The program will read the instructions from the 0,0 Cell in Excel file and execute them as command-line commands on your machine. On Windows, the commands will be executed using the cmd.exe shell, while on Unix-based systems they will be executed using the /bin/bash shell.
 
-### Only the first cell must be filled with the command at this time (further improvements will be possible :) )
+**Only the first cell must be filled with the command at this time (further improvements will be possible :) )**
 
 Note that - for now - cert.pfx file and private.json must be in same folder of the executable.
 
 ## Output
 Check your Sharepoint site. A file (default: output.xlsx) will contain the output of your command.
 
-### Note that a 15 seconds delay has been hardcoded in order to let the online docs be aligned 
+**Note that a 15 seconds delay has been hardcoded in order to let the online docs be aligned **
 
 ## Further improvements
 Many, this is a sort of experiment, nothing more than a PoC:
 1) Avoid double excel and try to have all the commands history in one file
 2) modify code in order to not have .pfx and .json in same folder of executable (embedded Auth in GOSip throws errors)
 3) Usage of Graph API (Go support is still too much in early stage as per May 2023)
+**Pull request as you like***
+
+## Disclaimer 
+This is a PoC, and the creator is not responsible for any illicit use of this. Please use it responsibly.
 
 
