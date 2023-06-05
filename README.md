@@ -95,6 +95,8 @@ The program will read the instructions from the 0,0 Cell in Excel file and execu
 
 Note that - for now - cert.pfx file and private.json must be in same folder of the executable.
 
+Insert command "exitc2" in order to remotely stop the agent.
+
 ## Output
 Check your Sharepoint site. A file (default: output.xlsx) will contain the output of your command.
 
