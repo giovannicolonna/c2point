@@ -130,6 +130,8 @@ Many, this is a sort of experiment, nothing more than a PoC:
 1) Avoid double excel and try to have all the commands history in one file
 2) modify code in order to not have .pfx and .json in same folder of executable (embedded Auth in GOSip throws errors)
 3) Usage of Graph API (Go support is still too much in early stage as per May 2023)
+4) Download of files from Attacker-Owned Sharepoint Site to target system
+
 **Pull request as you like***
 
 ## Disclaimer 
