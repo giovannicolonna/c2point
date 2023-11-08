@@ -52,7 +52,7 @@ func main() {
 	
 	// +++++ SET HERE YOUR OUTPUT PATH
 	outFile := "output.xlsx"
-	fileOutputURL := "7sites/yoursite/Shared Documents/" + outFile
+	fileOutputURL := "/sites/yoursite/Shared Documents/" + outFile
 	
 	// Main Loop: reads - downloads - executes - uploads - sleeps
 	
