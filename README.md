@@ -59,6 +59,8 @@ Here is an example of how to initialize private.json with the necessary fields f
 
 ```
 Make sure to replace the placeholders (tenant-id, clientId, certPath and certPass) with the actual values for your SharePoint environment.
+Don't forget to create a site in Sharepoint, you'll need the sitename into both private.json and source code.
+
 **Create a 'config' folder in same directory of your .go file and put inside it the private.json and the .pfx cert file**
 
 
